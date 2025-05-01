@@ -50,7 +50,7 @@ public final class Constants {
     public static final boolean k_backRightInverted = false;
     public static final boolean k_backRightAbsInverted = false;
     public static final double k_backRightChassisOffset = 0.0; //help
-    public static final double k_backRightAbsOffset = 0.000244 * 2 * Math.PI;
+    public static final double k_backRightAbsOffset = 0.0 * 2 * Math.PI;
 
     public enum MotorLocation {
       FRONT_LEFT,
@@ -76,7 +76,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int k_driverControllerPort = 0;
     public static final int k_driveYInverted = 1;
-    public static final int k_driveXInverted = -1;
+    public static final int k_driveXInverted = 1;
     public static final int k_driveZInverted = 1;
     public static final double k_deadband = 0.3;
   }

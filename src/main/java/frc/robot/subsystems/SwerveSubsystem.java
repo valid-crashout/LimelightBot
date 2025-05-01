@@ -2,8 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import com.kauailabs.navx.frc.AHRS;
-
+import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,14 +10,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.MotorLocation;
 
 public class SwerveSubsystem extends SubsystemBase {
-    
     private final SwerveModule m_frontLeft = new SwerveModule(
         SwerveConstants.k_frontLeftDriveID,
         SwerveConstants.k_frontLeftTurnID,
@@ -67,12 +66,15 @@ public class SwerveSubsystem extends SubsystemBase {
         Configs.SwerveModule.backRightTurningConfig,
         MotorLocation.BACK_RIGHT);
 
-    private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
+    private final AHRS m_gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     private final SwerveDriveOdometry m_odometer = new SwerveDriveOdometry(SwerveConstants.k_driveKinematics,
                                                    new Rotation2d(0), getSwerveModulePositions());
 
     private SwerveModuleState[] m_desiredModuleStates;
+
+    private StructArrayPublisher<SwerveModuleState> publisherDesiredStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct).publish();
+    private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
 
     public SwerveSubsystem() {
         m_desiredModuleStates = new SwerveModuleState[] {new SwerveModuleState(), new SwerveModuleState(), 
@@ -149,6 +151,14 @@ public class SwerveSubsystem extends SubsystemBase {
         m_frontRight.stop();
         m_backLeft.stop();
         m_backRight.stop();
+    }
+
+    @Override
+    public void periodic()
+    {
+        m_odometer.update(getRotation2d(), getSwerveModulePositions());
+        publisherDesiredStates.set(m_desiredModuleStates);
+        publisherActualStates.set(getSwerveModuleStates());
     }
 }
 
