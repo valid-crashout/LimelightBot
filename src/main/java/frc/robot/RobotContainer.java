@@ -34,7 +34,8 @@ public class RobotContainer {
                                          () -> m_driverController.getRawAxis(1),
                                          () -> m_driverController.getRawAxis(0),
                                          () -> m_driverController.getRawAxis(4),
-                                         () -> true));
+                                         () -> true,
+                                         () -> false));
     configureBindings();
   }
 
@@ -61,7 +62,12 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    //return Autos.exampleAuto(m_exampleSubsystem);
-    return null;
+  return new DriveCommand(
+    m_swerveSubsystem,
+    null,
+    () -> 0.0,
+    null,
+    () -> false,
+    () -> true); 
   }
 }

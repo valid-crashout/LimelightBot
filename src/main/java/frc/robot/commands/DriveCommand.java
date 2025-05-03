@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class DriveCommand extends Command {
@@ -17,12 +18,12 @@ public class DriveCommand extends Command {
   private final SlewRateLimiter xLimiter, yLimiter, zLimiter;
   
   public DriveCommand(SwerveSubsystem p_swerveSub, Supplier<Double> p_xSpdFunction, Supplier<Double> p_ySpdFunction, 
-                      Supplier<Double> p_zSpdFunction, Supplier<Boolean> p_fieldOrientedFunction) {
+                      Supplier<Double> p_zSpdFunction, Supplier<Boolean> p_fieldOrientedFunction, Supplier<Boolean> p_limelight) {
     m_swerveSubsystem = p_swerveSub;
-    xSpdFunction = p_xSpdFunction;
+    xSpdFunction = (p_limelight.get()) ? () -> LimelightSubsystem.limelight_range_proportional() : p_xSpdFunction;
     ySpdFunction = p_ySpdFunction;
-    zSpdFunction = p_zSpdFunction;
-    fieldOrientedFunction = p_fieldOrientedFunction;
+    zSpdFunction = (p_limelight.get()) ? () -> LimelightSubsystem.limelight_aim_proportional() : p_zSpdFunction;
+    fieldOrientedFunction = (p_limelight.get()) ? () -> false : p_fieldOrientedFunction;
     xLimiter = new SlewRateLimiter(SwerveConstants.k_maxAccelerationMPSSquared);
     yLimiter = new SlewRateLimiter(SwerveConstants.k_maxAccelerationMPSSquared);
     zLimiter = new SlewRateLimiter(SwerveConstants.k_maxAngularAccelerationMPSSquared);
